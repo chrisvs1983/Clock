@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><title>Wake Time</title></head>
+<body id="bg" style="margin:0; height:100vh;">
+<script>
+function updateBg() {
+  const now = new Date();
+  const hour = now.getHours();
+  const min = now.getMinutes();
+  const bg = document.getElementById('bg');
+  if (hour >= 7) {
+    bg.style.backgroundColor = 'green';
+  } else {
+    bg.style.backgroundColor = 'red';
+  }
+}
+setInterval(updateBg, 1000);
+updateBg();
+</script>
+</body>
+</html>
