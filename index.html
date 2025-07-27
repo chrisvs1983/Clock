@@ -24,7 +24,7 @@
     }
 
     /* Controls */
-    #controls {
+    .controls {
       display: flex;
       align-items: center;
       gap: 1rem;
@@ -68,7 +68,7 @@
 </head>
 <body class="day">
   <div id="clock">00:00:00</div>
-  <div id="controls">
+  <div class="controls">
     <label>
       Awake
       <input type="time" id="awake" />
@@ -77,6 +77,9 @@
       Sleep
       <input type="time" id="sleep" />
     </label><br>
+    
+  </div>
+  <div class="controls">
     <button id="saveBtn">Save</button>
   </div>
 
