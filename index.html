@@ -1,21 +1,153 @@
 <!DOCTYPE html>
-<html>
-<head><title>Wake Time</title></head>
-<body id="bg" style="margin:0; height:100vh;">
-<script>
-function updateBg() {
-  const now = new Date();
-  const hour = now.getHours();
-  const min = now.getMinutes();
-  const bg = document.getElementById('bg');
-  if (hour >= 7) {
-    bg.style.backgroundColor = 'green';
-  } else {
-    bg.style.backgroundColor = 'red';
-  }
-}
-setInterval(updateBg, 1000);
-updateBg();
-</script>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Colour-Changing Clock</title>
+  <style>
+    /* Reset and layout */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: sans-serif;
+      transition: background 0.5s, color 0.5s;
+    }
+
+    /* Clock style */
+    #clock {
+      font-size: 6rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Controls */
+    #controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      font-size: 1rem;
+      text-align: center;
+    }
+    input[type="time"], button {
+      font-size: 1rem;
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid currentColor;
+      background: rgba(255,255,255,0.3);
+      color: inherit;
+    }
+    button { cursor: pointer; }
+
+    /* Day theme */
+    body.day {
+      background: yellow;
+      color: white;
+    }
+    body.day input, body.day button {
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* Night theme */
+    body.night {
+      background: darkblue;
+      color: darkgrey;
+    }
+    body.night input, body.night button {
+      background: #333;
+      border-color: #555;
+      color: white;
+    }
+  </style>
+</head>
+<body class="day">
+  <div id="clock">00:00:00</div>
+  <div id="controls">
+    <label>
+      Awake
+      <input type="time" id="awake" />
+    </label>
+    <label>
+      Sleep
+      <input type="time" id="sleep" />
+    </label>
+    <button id="saveBtn">Save</button>
+  </div>
+
+  <script>
+    // Cookie helpers
+    function setCookie(name, value, days = 365) {
+      const expires = new Date(Date.now() + days*24*60*60*1000)
+        .toUTCString();
+      document.cookie = name + "=" + encodeURIComponent(value) +
+        "; expires=" + expires + "; path=/";
+    }
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp('(^| )' +
+        name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+
+    // Apply theme based on times
+    function updateTheme(now) {
+      const awakeVal = document.getElementById('awake').value;
+      const sleepVal = document.getElementById('sleep').value;
+      if (!awakeVal || !sleepVal) return;
+
+      const [ah, am] = awakeVal.split(':').map(Number);
+      const [sh, sm] = sleepVal.split(':').map(Number);
+      const nowMin   = now.getHours() * 60 + now.getMinutes();
+      const awakeMin = ah*60 + am;
+      const sleepMin = sh*60 + sm;
+
+      let night;
+      if (sleepMin > awakeMin) {
+        // e.g. sleep at 22:00, wake at 07:00
+        night = nowMin >= sleepMin || nowMin < awakeMin;
+      } else {
+        // e.g. sleep at 02:00, wake at 10:00
+        night = nowMin >= sleepMin && nowMin < awakeMin;
+      }
+
+      document.body.className = night ? 'night' : 'day';
+    }
+
+    // Update clock text and theme every second
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent =
+        now.toLocaleTimeString('en-GB', { hour12: false });
+      updateTheme(now);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Load saved times from cookies
+      const awakeCook = getCookie('awakeTime');
+      const sleepCook = getCookie('sleepTime');
+      if (awakeCook) document.getElementById('awake').value = awakeCook;
+      if (sleepCook) document.getElementById('sleep').value = sleepCook;
+
+      // Save button handler
+      document.getElementById('saveBtn')
+        .addEventListener('click', () => {
+          const awakeVal = document.getElementById('awake').value;
+          const sleepVal = document.getElementById('sleep').value;
+          if (awakeVal) setCookie('awakeTime', awakeVal);
+          if (sleepVal) setCookie('sleepTime', sleepVal);
+          updateTheme(new Date());
+        });
+
+      // Start clock
+      updateClock();
+      setInterval(updateClock, 1000);
+    });
+  </script>
 </body>
 </html>
+d
