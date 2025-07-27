@@ -56,11 +56,11 @@
 
     /* Night theme */
     body.night {
-      background:rgb(0,0,30);
-      color: darkgrey;
+      background:rgb(0,0,40);
+      color: rgb(0,0,60);
     }
     body.night input, body.night button {
-      background: #333;
+      background: rgb(0,0,60);
       border-color: #555;
       color: black;
     }
@@ -76,7 +76,7 @@
     <label>
       Sleep
       <input type="time" id="sleep" />
-    </label>
+    </label><br>
     <button id="saveBtn">Save</button>
   </div>
 
@@ -141,6 +141,7 @@
           if (awakeVal) setCookie('awakeTime', awakeVal);
           if (sleepVal) setCookie('sleepTime', sleepVal);
           updateTheme(new Date());
+          alert('Times saved!');
         });
 
       // Start clock
